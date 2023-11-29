@@ -42,15 +42,23 @@ namespace WinFormsApp22
 
             // 外部アプリケーションを開始
             externalProcess = Process.Start(externalAppPath);
-
             // 外部アプリケーションのウィンドウハンドルを取得し、自分のフォームに埋め込む
             if (externalProcess != null)
             {
-                IntPtr externalAppHandle = externalProcess.MainWindowHandle;
-                SetParent(externalAppHandle, this.Handle);
+                while (true)
+                {
+                    IntPtr externalAppHandle = externalProcess.MainWindowHandle;
+                    if (externalAppHandle == IntPtr.Zero)
+                    {
+                        Thread.Sleep(100);
+                        continue;
+                    }
+                    SetParent(externalAppHandle, this.Handle);
 
-                // 外部アプリケーションのウィンドウを自分のフォーム内に表示
-                SetWindowPos(externalAppHandle, IntPtr.Zero, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_SHOWWINDOW);
+                    // 外部アプリケーションのウィンドウを自分のフォーム内に表示
+                    SetWindowPos(externalAppHandle, IntPtr.Zero, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_SHOWWINDOW);
+                    return;
+                }
             }
         }
     }
